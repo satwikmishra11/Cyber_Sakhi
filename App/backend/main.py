@@ -54,7 +54,7 @@ def categorize_posts(posts):
     categorized_posts = {}
 
     for post in posts:
-        post_id = str(post["_id"])  # Convert MongoDB ObjectID to string
+        post_id = str(post["tweet"]["tweet_id"])
         post_text = post["tweet"]["tweet_content"]
 
         prompt = f"""
@@ -175,13 +175,24 @@ def dashboard():
     all_posts = list(MongoClient(os.getenv("SOCIAL_MEDIA_MONGODB_URI"))["flutterbird"]["posts"].find({
         "$or": [
             {"tweet.tweet_content": {"$regex": f"@{user['username']}", "$options": "i"}},
-            {"tweet.tweet_content": {"$regex": f"{user['name']}", "$options": "i"}}
+            {"tweet.tweet_content": {"$regex": f"{user['name']}", "$options": "i"}},
+            {"tweet.tweet_content": {"$regex": f"{user['name'].split()[0]}", "$options": "i"}},
+            {"tweet.tweet_content": {"$regex": f"{user['name'].split()[1]}", "$options": "i"}},
         ]
-    }))
+    }, {"_id": 0, "tweet.tweet_id": 1, "tweet.tweet_content": 1}))
 
 
     # Process posts with Gemini Flash 2.0
     categorized_posts = categorize_posts(all_posts)
+
+    # Add post user info
+    for post_id, post in categorized_posts.items():
+        user_info = MongoClient(os.getenv("SOCIAL_MEDIA_MONGODB_URI"))["flutterbird"]["posts"].find_one(
+            {"tweet.tweet_id": post_id}, {"_id": 0, "user": 1}
+        )
+
+        if user_info:
+            post["user"] = user_info["user"]
 
     return render_template("dashboard.html", user_info=user_info, categorized_posts=categorized_posts)
 

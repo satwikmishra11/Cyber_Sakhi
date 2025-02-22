@@ -9,9 +9,11 @@
 </head>
 
 <body>
+
+  <!-- Header -->
   <header>
     <div class="logo-container">
-      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+      <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="#FFFFFF">
         <path
           d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 152-90.5 276.5T480-80Zm0-84q104-33 172-132t68-220v-189l-240-90-240 90v189q0 121 68 220t172 132Zm0-316Z" />
       </svg>
@@ -26,31 +28,34 @@
       </div>
     </div>
   </header>
+
+  <!-- Main Content -->
   <div class="main-container">
     <div class="scan-now-container">
       <button class="scan-now-button" onclick="window.location.href='/dashboard'">Scan Now</button>
     </div>
-    <!-- {{categorized_posts}} -->
-    {'67b966b4250eef27bc11617d': {'post_text': '@om-mishra7 is pretty rude ', 'category': 'Safe', 'probability': 0.9},
-    '67b96e0ebca867b9aadddb90': {'post_text': 'Let us beat up Om Mishra', 'category': 'Threat', 'probability': 1.0}}
+
     <div class="identified-posts-container">
       <h2 class="identified-posts-heading">Posts Mentioning You</h2>
       <div class="posts-container">
-        {% for post in categorized_posts %}
-        <div class="post-container">
-          <div class="post-text-container">
+        {% for post_id, post in categorized_posts.items() %}
+        <div class="post-card"
+          onclick="window.open('https://flutterbird.om-mishra.com/user/{{post['user']['user_name']}}/status/{{ post_id }}', '_blank')"
+          style="cursor: pointer;">
+          <div class="post-content">
             <p class="post-text">{{ post['post_text'] }}</p>
           </div>
-          <div class="post-category-container">
-            <p class="post-category">{{ post['category'] }}</p>
-          </div>
-          <div class="post-probability-container">
-            <p class="post-probability">{{ post['probability'] }}</p>
+          <div class="post-details">
+            <span class="post-category category-{{ post['category'] | lower }}">{{ post['category'] }}</span>
+            <span class="post-probability">Confidence: {{ post['probability'] * 100 }}%</span>
+            <span class="post-user">User: {{ post['user']['user_name'] }}</span>
           </div>
         </div>
-
-
+        {% endfor %}
       </div>
+    </div>
+  </div>
+
 </body>
 
 </html>
