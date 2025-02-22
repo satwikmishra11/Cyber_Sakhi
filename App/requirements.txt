@@ -3,3 +3,5 @@ redis
 pymongo
 flask_session
 python-dotenv
+face-recognition
+google-generativeai

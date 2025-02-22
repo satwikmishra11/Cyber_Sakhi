@@ -70,16 +70,17 @@ function callAPI(userProfile) {
         body: JSON.stringify({ profile: userProfile }),
     })
     .then(response => response.json())
-    .then(data => {
+        .then(data => {
+        console.log(data);
         if (data.status === "success") {
             window.location.href = `/dashboard?profile=${userProfile}`;
         } else {
-            alert("Failed to analyze profile. Please try again.");
+            alert(data.message);
             console.error(data);
         }
     })
     .catch(error => {
         console.error("Error:", error);
-        alert("Failed to analyze profile. Please try again.");
+        alert("An error occurred while checking the profile. Please try again later."); 
     });
 }

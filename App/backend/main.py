@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 
 import secrets
 
+import json
 import redis
 
 from datetime import datetime
@@ -12,9 +13,113 @@ from pymongo import MongoClient
 
 from flask_session import Session
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
+import google.generativeai as genai
+from google.ai.generativelanguage_v1beta.types import content
+
 
 # Load environment variables
 load_dotenv()
+
+# Configure API key
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+# Define the model and response schema
+generation_config = {
+    "temperature": 1,
+    "top_p": 0.95,
+    "top_k": 40,
+    "max_output_tokens": 8192,
+    "response_schema": content.Schema(
+        type=content.Type.OBJECT,
+        properties={
+            "category": content.Schema(type=content.Type.STRING),
+            "probability": content.Schema(type=content.Type.NUMBER),
+        },
+    ),
+    "response_mime_type": "application/json",
+}
+
+# Initialize Gemini model
+model = genai.GenerativeModel(
+    model_name="gemini-1.5-flash-8b",
+    generation_config=generation_config,
+)
+
+
+def categorize_posts(posts):
+    """Categorizes posts one by one using Gemini AI with JSON schema enforcement."""
+    if not posts:
+        return {}
+
+    categorized_posts = {}
+
+    for post in posts:
+        post_id = str(post["_id"])  # Convert MongoDB ObjectID to string
+        post_text = post["tweet"]["tweet_content"]
+
+        prompt = f"""
+        Classify the following post into one of the categories:
+        1. Harassment
+        2. Threat
+        3. Inappropriate
+        4. Safe
+
+        Post: "{post_text}"
+
+        Respond strictly in JSON format:
+        {{
+            "category": "...",
+            "probability": 0.0
+        }}
+        """
+
+        try:
+            # Start chat session
+            chat_session = model.start_chat(
+                history=[
+                    {"role": "user", "parts": [prompt]},
+                    {"role": "model", "parts": ["```json\n {\n  \"category\": \"Safe\",\n  \"probability\": 0.9\n}\n```"]},
+                ]
+            )
+
+            # Send request to Gemini API
+            response = chat_session.send_message(prompt)
+
+        
+            # Ensure response is not empty
+            if not response.text.strip():
+                raise ValueError("Received empty response from Gemini API")
+
+            # Parse the JSON response
+            response_data = json.loads(response.text)
+
+            # Validate expected keys in response
+            if "category" not in response_data or "probability" not in response_data:
+                raise ValueError("Missing expected keys in Gemini response")
+
+            # Store categorized post
+            categorized_posts[post_id] = {
+                "post_text": post_text,
+                "category": response_data["category"],
+                "probability": response_data["probability"],
+            }
+
+        except json.JSONDecodeError:
+            categorized_posts[post_id] = {
+                "post_text": post_text,
+                "category": "Error",
+                "probability": 0.0,
+            }
+
+        except Exception as e:
+            categorized_posts[post_id] = {
+                "post_text": post_text,
+                "category": "Error",
+                "probability": 0.0,
+            }
+
+    return categorized_posts
+
 
 app = Flask(__name__, static_folder="../assets", template_folder="../frontend")
 
@@ -53,6 +158,32 @@ def index():
         else:
           return render_template("index.html")
     return redirect(url_for("login"))
+
+@app.route("/dashboard")
+def dashboard():
+    user = session.get("user")
+    if not user:
+        return redirect(url_for("login"))
+
+    user_info = MONGO_CLIENT["USERS"].find_one({"user_id": user["user_id"]})
+    if not user_info or "account_info" not in user_info or "social_profile" not in user_info["account_info"]:
+        return redirect(url_for("login"))
+
+    # Fetch posts mentioning the user
+    # Fetch posts mentioning the user's username OR name
+
+    all_posts = list(MongoClient(os.getenv("SOCIAL_MEDIA_MONGODB_URI"))["flutterbird"]["posts"].find({
+        "$or": [
+            {"tweet.tweet_content": {"$regex": f"@{user['username']}", "$options": "i"}},
+            {"tweet.tweet_content": {"$regex": f"{user['name']}", "$options": "i"}}
+        ]
+    }))
+
+
+    # Process posts with Gemini Flash 2.0
+    categorized_posts = categorize_posts(all_posts)
+
+    return render_template("dashboard.html", user_info=user_info, categorized_posts=categorized_posts)
 
 
 # Authentication routes

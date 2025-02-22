@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberSakhi - AI-Powered Protection</title>
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+</head>
+
+<body>
+  <header>
+    <div class="logo-container">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+        <path
+          d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 152-90.5 276.5T480-80Zm0-84q104-33 172-132t68-220v-189l-240-90-240 90v189q0 121 68 220t172 132Zm0-316Z" />
+      </svg>
+      <div class="logo-text">
+        <h1 class="title">Cyber Sakhi</h1>
+        <p class="description">AI-Powered Protection</p>
+      </div>
+    </div>
+    <div class="nav-container">
+      <div class="user-container">
+        <img src="{{ session['user']['avatar_url'] }}" alt="User Image" class="user-image">
+      </div>
+    </div>
+  </header>
+  <div class="main-container">
+    <div class="scan-now-container">
+      <button class="scan-now-button" onclick="window.location.href='/dashboard'">Scan Now</button>
+    </div>
+    <!-- {{categorized_posts}} -->
+    {'67b966b4250eef27bc11617d': {'post_text': '@om-mishra7 is pretty rude ', 'category': 'Safe', 'probability': 0.9},
+    '67b96e0ebca867b9aadddb90': {'post_text': 'Let us beat up Om Mishra', 'category': 'Threat', 'probability': 1.0}}
+    <div class="identified-posts-container">
+      <h2 class="identified-posts-heading">Posts Mentioning You</h2>
+      <div class="posts-container">
+        {% for post in categorized_posts %}
+        <div class="post-container">
+          <div class="post-text-container">
+            <p class="post-text">{{ post['post_text'] }}</p>
+          </div>
+          <div class="post-category-container">
+            <p class="post-category">{{ post['category'] }}</p>
+          </div>
+          <div class="post-probability-container">
+            <p class="post-probability">{{ post['probability'] }}</p>
+          </div>
+        </div>
+
+
+      </div>
+</body>
+
+</html>
