@@ -1,0 +1,5 @@
+flask
+redis
+pymongo
+flask_session
+python-dotenv

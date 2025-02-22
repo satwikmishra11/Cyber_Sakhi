@@ -1,0 +1,126 @@
+/* Global Styles */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #e9dee1;
+  /* Soft pink background */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Logo */
+.logo {
+  width: 300px;
+}
+
+/* Card Styling */
+.container {
+  text-align: center;
+  max-width: 600px;
+  width: 90%;
+}
+
+.title {
+  font-size: 2rem;
+  color: #880e4f;
+  /* Deep pink for strong impact */
+  margin-bottom: 10px;
+}
+
+.description {
+  font-size: 1rem;
+  color: #6a1b9a;
+  /* Purple shade for empowerment */
+  margin-bottom: 20px;
+}
+
+/* Input and Button Styling */
+.input-field,
+.submit-btn {
+  width: 80%;
+  border-radius: 5px;
+  font-size: 16px;
+  outline: none;
+  padding: 12px 20px;
+  transition: border 0.3s ease-in-out;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.input-field {
+  border: 1px solid #ab47bc;
+  /* Softer purple border */
+  background: #fce4ec;
+  /* Light pink input field */
+}
+
+.input-field:focus {
+  border-color: #7b1fa2;
+}
+
+/* Button Styling */
+.submit-btn {
+  background-color: #d81b60;
+  /* Vibrant pink */
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease-in-out;
+}
+
+.submit-btn:hover {
+  background-color: #ad1457;
+  /* Darker pink on hover */
+}
+
+/* Fullscreen Loading Screen with Animated Facts */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: white;
+  font-size: 1.5rem;
+  text-align: center;
+  padding: 20px;
+  z-index: 1000;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.loading-message {
+  animation: fadeInOut 1s infinite alternate;
+  max-width: 80%;
+  line-height: 1.5;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
