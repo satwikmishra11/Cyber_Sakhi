@@ -4,4 +4,3 @@ pymongo
 flask_session
 python-dotenv
 google-generativeai
-opencv-python

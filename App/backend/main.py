@@ -15,7 +15,6 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for, s
 import google.generativeai as genai
 from google.ai.generativelanguage_v1beta.types import content
 
-import cv2
 import requests
 import os
 
@@ -39,23 +38,6 @@ def compare_faces(img1_url=None, img2_url=None, img1_path=None, img2_path=None):
     Returns:
         bool: True if faces match (confidence > 75), otherwise False.
     """
-    # 🖼️ Function to resize an image (for local files)
-    def resize_image(image_path, output_path, max_size=MAX_SIZE):
-        img = cv2.imread(image_path)
-        if img is None:
-            print(f"Error: Could not read {image_path}")
-            return False
-        h, w = img.shape[:2]
-
-        if max(h, w) > max_size:
-            scale = max_size / max(h, w)
-            new_size = (int(w * scale), int(h * scale))
-            resized_img = cv2.resize(img, new_size)
-            cv2.imwrite(output_path, resized_img)
-        else:
-            cv2.imwrite(output_path, img)
-        return True
-
     # 📤 Prepare API request
     files = {}
     data = {"api_key": API_KEY, "api_secret": API_SECRET}
@@ -66,17 +48,6 @@ def compare_faces(img1_url=None, img2_url=None, img1_path=None, img2_path=None):
         data["image_url1"] = img1_url
         data["image_url2"] = img2_url
 
-    # 📁 If using local files, resize and send image_file1 and image_file2
-    elif img1_path and img2_path:
-        resized1, resized2 = "img1_resized.jpg", "img2_resized.jpg"
-
-        if resize_image(img1_path, resized1) and resize_image(img2_path, resized2):
-            files["image_file1"] = open(resized1, "rb")
-            files["image_file2"] = open(resized2, "rb")
-            resized_images.extend([resized1, resized2])
-        else:
-            print("Error: Could not resize images.")
-            return False
     else:
         print("Error: Provide either image URLs or local file paths.")
         return False
