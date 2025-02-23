@@ -108,7 +108,7 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2 group cursor-pointer">
-              <Shield className="h-8 w-8 text-primary-600 dark:text-primary-400 transition-transform duration-300 group-hover:scale-110" />
+             <img src="https://i.ibb.co/b5c0jcVv/Whats-App-Image-2025-02-23-at-14-34-08-b7909344.jpg" alt="Shield Icon" className="h-8 w-8 text-primary-600 dark:text-primary-400 transition-transform duration-300 group-hover:scale-110"/>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 dark:from-primary-400 dark:to-secondary-400 bg-clip-text text-transparent">
                   CyberSakhi
