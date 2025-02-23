@@ -1,0 +1,7 @@
+{
+    "version": 2,
+    "builds": [
+        {"src": "App/backend/main.py", "use": "@vercel/python"}
+    ],
+    "routes": [{"src": "/(.*)", "dest": "App/backend/main.py"}]
+}
