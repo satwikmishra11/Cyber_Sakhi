@@ -1,7 +1,14 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: none;
+  font-family: 'Poppins', sans-serif;
+}
+
 /* Global Styles */
 body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f3e5f5;
+  background-color: #f5f5f5;
   margin: 0;
   padding: 0;
   display: flex;
@@ -13,24 +20,40 @@ body {
 
 /* Header */
 header {
-  width: 100%;
-  height: 70px;
-  background-color: #ee99ac;
+  height: 80px;
+  background-color: #FFF;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
+/* Add spacing under header */
+.main-container {
+  width: 100%;
+  text-align: left;
+  padding: 20px;
+  margin-top: 100px;
+  /* Added spacing */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 20px;
+
+}
+
+/* Logo & Navigation */
 .logo-container {
   display: flex;
   align-items: center;
-}
-
-.logo-container svg {
-  width: 40px;
-  height: 40px;
-  fill: #880e4f;
 }
 
 .logo-text {
@@ -41,40 +64,57 @@ header {
 
 .logo-text h1 {
   font-size: 1.5rem;
-  color: #880e4f;
+  color: #0d47a1;
+  /* Blue */
   margin: 0;
 }
 
 .logo-text p {
   font-size: 0.9rem;
-  color: #6a1b9a;
+  color: #1976d2;
+  /* Blue */
   margin: 0;
+  width: 100%;
+}
+
+.nav-container {
+  display: flex;
+  gap: 20px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-link {
+  font-size: 1rem;
+  color: #0d47a1;
+  /* Blue */
+  text-decoration: none;
+  transition: all 0.3s ease;
 }
 
 .user-container img {
   width: 50px;
   height: 50px;
-  border-radius: 50%;
-}
-
-/* Main Container */
-.main-container {
-  width: 90%;
-  max-width: 800px;
-  text-align: center;
-  margin-top: 20px;
+  border-radius: 10px;
 }
 
 /* Scan Now Button */
 .scan-now-container {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .scan-now-button {
   padding: 12px 25px;
   font-size: 16px;
   font-weight: bold;
-  background-color: #880e4f;
+  background-color: #1565c0;
+  /* Blue */
   color: white;
   border: none;
   border-radius: 8px;
@@ -83,19 +123,26 @@ header {
 }
 
 .scan-now-button:hover {
-  background-color: #6a1b9a;
+  background-color: #0d47a1;
+  /* Darker Blue */
 }
 
 /* Identified Posts */
 .identified-posts-container {
   width: 100%;
   text-align: center;
+  margin-top: 10px;
+  /* Added spacing */
+  padding: 20px;
 }
 
 .identified-posts-heading {
   font-size: 24px;
-  color: #6a1b9a;
+  color: #000;
+  /* Blue */
   margin-bottom: 10px;
+  width: 100%;
+  text-align: left;
 }
 
 /* Posts Container */
@@ -104,11 +151,12 @@ header {
   flex-direction: column;
   align-items: center;
   gap: 15px;
+  /* Added spacing */
 }
 
 /* Individual Post Card */
 .post-card {
-  width: 90%;
+  width: 100%;
   background-color: white;
   border-radius: 10px;
   padding: 15px;
@@ -125,7 +173,8 @@ header {
 
 .post-content {
   font-size: 16px;
-  color: #333;
+  color: #0d47a1;
+  /* Blue */
   text-align: left;
 }
 
@@ -135,6 +184,8 @@ header {
   justify-content: space-between;
   align-items: center;
   font-size: 14px;
+  color: #1976d2;
+  /* Blue */
 }
 
 /* Category Styling */
@@ -164,5 +215,49 @@ header {
 
 .post-probability {
   font-size: 14px;
-  color: #555;
+  color: #0d47a1;
+  /* Blue */
+}
+
+.stats-container {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.stat-card {
+  padding: 15px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+  width: 30%;
+  height: 200px;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-card h3 {
+  font-size: 1.2rem;
+  color: #0d47a1;
+  /* Blue */
+  margin: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.stat-card p {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1976d2;
+  /* Blue */
+  margin: 0;
+  width: 100%;
+  text-align: center;
 }

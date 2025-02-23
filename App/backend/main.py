@@ -16,9 +16,105 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for, s
 import google.generativeai as genai
 from google.ai.generativelanguage_v1beta.types import content
 
+import cv2
+import requests
+import os
+
+
+# 🎯 Max image size for resizing
+MAX_SIZE = 600
+
+# 📌 API Endpoint
+API_URL = "https://api-us.faceplusplus.com/facepp/v3/compare"
+
+def compare_faces(img1_url=None, img2_url=None, img1_path=None, img2_path=None):
+    """
+    Compare two faces from either URLs or local file paths using Face++ API.
+    
+    Parameters:
+        img1_url (str): URL of the first image.
+        img2_url (str): URL of the second image.
+        img1_path (str): Local path of the first image.
+        img2_path (str): Local path of the second image.
+
+    Returns:
+        bool: True if faces match (confidence > 75), otherwise False.
+    """
+    # 🖼️ Function to resize an image (for local files)
+    def resize_image(image_path, output_path, max_size=MAX_SIZE):
+        img = cv2.imread(image_path)
+        if img is None:
+            print(f"Error: Could not read {image_path}")
+            return False
+        h, w = img.shape[:2]
+
+        if max(h, w) > max_size:
+            scale = max_size / max(h, w)
+            new_size = (int(w * scale), int(h * scale))
+            resized_img = cv2.resize(img, new_size)
+            cv2.imwrite(output_path, resized_img)
+        else:
+            cv2.imwrite(output_path, img)
+        return True
+
+    # 📤 Prepare API request
+    files = {}
+    data = {"api_key": API_KEY, "api_secret": API_SECRET}
+    resized_images = []
+
+    # 🌍 If using URLs, send image_url1 and image_url2
+    if img1_url and img2_url:
+        data["image_url1"] = img1_url
+        data["image_url2"] = img2_url
+
+    # 📁 If using local files, resize and send image_file1 and image_file2
+    elif img1_path and img2_path:
+        resized1, resized2 = "img1_resized.jpg", "img2_resized.jpg"
+
+        if resize_image(img1_path, resized1) and resize_image(img2_path, resized2):
+            files["image_file1"] = open(resized1, "rb")
+            files["image_file2"] = open(resized2, "rb")
+            resized_images.extend([resized1, resized2])
+        else:
+            print("Error: Could not resize images.")
+            return False
+    else:
+        print("Error: Provide either image URLs or local file paths.")
+        return False
+
+    # 📡 Send API Request
+    response = requests.post(API_URL, files=files, data=data)
+
+    # 🔍 Try to parse JSON response
+    try:
+        json_response = response.json()
+        confidence = json_response.get("confidence", 0)
+
+        # 🧹 Close files if they were opened
+        for f in files.values():
+            f.close()
+
+        # 🗑️ Delete resized images if they exist
+        for img in resized_images:
+            if os.path.exists(img):
+                os.remove(img)
+
+        # ✅ Return True if confidence > 75, else False
+        return confidence > 75
+
+    except requests.exceptions.JSONDecodeError:
+        print("Failed to decode JSON. Possible API error.")
+        return False
+
+
+
 
 # Load environment variables
 load_dotenv()
+
+
+API_KEY = os.getenv("API_KEY")
+API_SECRET = os.getenv("API_SECRET")
 
 # Configure API key
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
@@ -44,6 +140,7 @@ model = genai.GenerativeModel(
     model_name="gemini-1.5-flash-8b",
     generation_config=generation_config,
 )
+
 
 
 def categorize_posts(posts):
@@ -172,14 +269,17 @@ def dashboard():
     # Fetch posts mentioning the user
     # Fetch posts mentioning the user's username OR name
 
+    user = user_info["account_info"]["social_profile"]
+
     all_posts = list(MongoClient(os.getenv("SOCIAL_MEDIA_MONGODB_URI"))["flutterbird"]["posts"].find({
         "$or": [
-            {"tweet.tweet_content": {"$regex": f"@{user['username']}", "$options": "i"}},
-            {"tweet.tweet_content": {"$regex": f"{user['name']}", "$options": "i"}},
-            {"tweet.tweet_content": {"$regex": f"{user['name'].split()[0]}", "$options": "i"}},
-            {"tweet.tweet_content": {"$regex": f"{user['name'].split()[1]}", "$options": "i"}},
+            {"tweet.tweet_content": {"$regex": f"@{user['user_name']}", "$options": "i"}},
+            {"tweet.tweet_content": {"$regex": f"{user['profile']['name']}", "$options": "i"}},
+            {"tweet.tweet_content": {"$regex": f"{user['profile']['name'].split()[0]}", "$options": "i"}},
         ]
     }, {"_id": 0, "tweet.tweet_id": 1, "tweet.tweet_content": 1}))
+
+    print(all_posts)
 
 
     # Process posts with Gemini Flash 2.0
@@ -194,7 +294,37 @@ def dashboard():
         if user_info:
             post["user"] = user_info["user"]
 
-    return render_template("dashboard.html", user_info=user_info, categorized_posts=categorized_posts)
+    
+    photos_collection = MongoClient(os.getenv("SOCIAL_MEDIA_MONGODB_URI"))["flutterbird"]["posts"]
+
+    all_pictures = list(photos_collection.find({}, {"_id": 0, "tweet.tweet_id": 1, "tweet.tweet_media": 1}))
+
+    # Filter posts with media
+    posts_with_media = [post for post in all_pictures if len(post["tweet"].get("tweet_media", [])) > 0]
+
+    # Dictionary to store matched posts
+    image_categorized_posts = {}
+
+    # Iterate through posts with media
+    for post in posts_with_media:
+        tweet_id = post["tweet"]["tweet_id"]
+        media_urls = post["tweet"]["tweet_media"]
+        
+        for media_url in media_urls:
+            if compare_faces(img1_url=user["profile"]["profile_picture_url"], img2_url=media_url):
+                image_categorized_posts[tweet_id] = {"tweet_media": media_urls}
+                break  # Stop checking once a match is found
+
+    # Fetch user details and update categorized posts
+    for post_id in image_categorized_posts.keys():
+        user_info = photos_collection.find_one({"tweet.tweet_id": post_id}, {"_id": 0, "user": 1})
+        
+        if user_info:
+            image_categorized_posts[post_id]["user"] = user_info["user"]
+
+    print(image_categorized_posts)
+
+    return render_template("dashboard.html", user_info=user_info, categorized_posts=categorized_posts, username=user["user_name"], total_posts=MongoClient(os.getenv("SOCIAL_MEDIA_MONGODB_URI"))["flutterbird"]["posts"].count_documents({}), total_identified_posts=len(categorized_posts), total_image_posts=len(image_categorized_posts), image_categorized_posts=image_categorized_posts)
 
 
 # Authentication routes

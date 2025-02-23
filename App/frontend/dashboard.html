@@ -13,24 +13,37 @@
   <!-- Header -->
   <header>
     <div class="logo-container">
-      <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="#FFFFFF">
-        <path
-          d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 152-90.5 276.5T480-80Zm0-84q104-33 172-132t68-220v-189l-240-90-240 90v189q0 121 68 220t172 132Zm0-316Z" />
-      </svg>
+      <img src="assets/images/logo.svg" alt="Cyber Sakhi Logo" class="logo" style="width: 50px; height: 50px;">
       <div class="logo-text">
         <h1 class="title">Cyber Sakhi</h1>
         <p class="description">AI-Powered Protection</p>
       </div>
     </div>
     <div class="nav-container">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/dashboard" class="nav-link">Scan Now</a>
       <div class="user-container">
         <img src="{{ session['user']['avatar_url'] }}" alt="User Image" class="user-image">
       </div>
     </div>
   </header>
-
   <!-- Main Content -->
   <div class="main-container">
+    <h2 class="welcome-heading">Cyber Sakhi is protecting @{{username | lower}}!</h2>
+    <div class="stats-container">
+      <div class="stat-card">
+        <h3 class="stat-heading">Total Posts Scanned</h3>
+        <p class="stat-value">{{ total_posts }}</p>
+      </div>
+      <div class="stat-card">
+        <h3 class="stat-heading">Posts Mentioning You</h3>
+        <p class="stat-value">{{ total_identified_posts }}</p>
+      </div>
+      <div class="stat-card">
+        <h3 class="stat-heading">Posts Using Your Image</h3>
+        <p class="stat-value">{{ total_image_posts }}</p>
+      </div>
+    </div>
     <div class="scan-now-container">
       <button class="scan-now-button" onclick="window.location.href='/dashboard'">Scan Now</button>
     </div>
@@ -54,7 +67,28 @@
         {% endfor %}
       </div>
     </div>
-  </div>
+    <div class="identified-posts-container">
+      <h2 class="identified-posts-heading">Posts Using Your Image</h2>
+      <div class="posts-container">
+        {% for post_id, post in image_categorized_posts.items() %}
+        <div class="post-card"
+          onclick="window.open('https://flutterbird.om-mishra.com/user/{{post['user']['user_name']}}/status/{{ post_id }}', '_blank')"
+          style="cursor: pointer;">
+          <div class="post-content">
+            {% for image_url in post['tweet_media'] %}
+            <img src="{{ image_url }}" alt="Post Image" class="post-image"
+              style="width: 300px; height: 300px;border-radius: 10px;">
+            {% endfor %}
+          </div>
+          <div class="post-details">
+            <span class="post-category category-inappropriate">Unauthorized Image Usage</span>
+            <span class="post-probability">Confidence: 100%</span>
+            <span class="post-user">User: {{ post['user']['user_name'] }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
 
 </body>
 

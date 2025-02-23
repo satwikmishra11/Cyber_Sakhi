@@ -1,8 +1,13 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: none;
+  font-family: 'Poppins', sans-serif;
+}
+
 /* Global Styles */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #e9dee1;
-  /* Soft pink background */
   margin: 0;
   padding: 0;
   display: flex;
@@ -14,29 +19,54 @@ body {
 }
 
 /* Logo */
-.logo {
+.hero-image {
   width: 300px;
 }
 
 /* Card Styling */
 .container {
   text-align: center;
-  max-width: 600px;
-  width: 90%;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 80px;
+  padding: 20px;
+  overflow: hidden;
 }
+
+.card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+  width: 70%;
+}
+
 
 .title {
   font-size: 2rem;
-  color: #880e4f;
+  color: #000;
   /* Deep pink for strong impact */
   margin-bottom: 10px;
+  text-align: left;
+  width: 100%;
 }
 
 .description {
   font-size: 1rem;
-  color: #6a1b9a;
+  color: #555;
   /* Purple shade for empowerment */
   margin-bottom: 20px;
+  width: 100%;
+  text-align: left;
+  break-inside:auto;
+  word-wrap: break-word;
+  width: 80%;
 }
 
 /* Input and Button Styling */
@@ -53,20 +83,21 @@ body {
 }
 
 .input-field {
-  border: 1px solid #ab47bc;
-  /* Softer purple border */
-  background: #fce4ec;
-  /* Light pink input field */
-}
+/* Use blue */
+  border: 1px solid #64b5f6;
+  /* Softer blue border */
+  background: #e3f2fd;
+  /* Light blue input field */
 
-.input-field:focus {
-  border-color: #7b1fa2;
+  .input-field:focus {
+    border-color: #1976d2;
+  }
 }
 
 /* Button Styling */
 .submit-btn {
-  background-color: #d81b60;
-  /* Vibrant pink */
+  background-color: #1565c0;
+  /* Deep blue */
   color: white;
   border: none;
   cursor: pointer;
@@ -75,8 +106,7 @@ body {
 }
 
 .submit-btn:hover {
-  background-color: #ad1457;
-  /* Darker pink on hover */
+background-color: #0d47a1;
 }
 
 /* Fullscreen Loading Screen with Animated Facts */

@@ -6,12 +6,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cyber Sakhi - Your Digital Guardian</title>
   <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/dashboard.css">
   <script src="assets/js/index.js"></script>
 </head>
 
 <body>
+  <!-- Header -->
+  <header>
+    <div class="logo-container">
+      <img src="assets/images/logo.svg" alt="Cyber Sakhi Logo" class="logo" style="width: 50px; height: 50px;">
+      <div class="logo-text">
+        <h1 class="title">Cyber Sakhi</h1>
+        <p class="description">AI-Powered Protection</p>
+      </div>
+    </div>
+    <div class="nav-container">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/dashboard" class="nav-link">Scan Now</a>
+      <div class="user-container">
+        <img src="{{ session['user']['avatar_url'] }}" alt="User Image" class="user-image">
+      </div>
+    </div>
+  </header>
 
-  <img src="assets/images/logo.svg" alt="Cyber Sakhi Logo" class="logo">
 
   <div class="container">
     <div class="card">
@@ -24,8 +41,9 @@
       <input type="text" id="social-profile" name="social-profile"
         placeholder="Enter your account name: e.g. @cybersakhi" class="input-field">
 
-      <button type="submit" class="submit-btn">Keep Me Safe 🔒</button>
+      <button type="submit" class="submit-btn">Scan Now</button>
     </div>
+    <img src="/assets/images/bg-main.png" alt="Hero Image" class="hero-image">
   </div>
 
 </body>
